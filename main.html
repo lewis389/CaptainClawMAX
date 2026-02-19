@@ -94,3 +94,51 @@
       margin-bottom: 1rem;
     }
     .card h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+    .card h4 { font-size: 0.9rem; margin: 0.75rem 0 0.5rem; color: var(--text-dim); }
+    label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+    .input, textarea, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .row .card { flex: 1; min-width: 280px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .msg { padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; font-size: 0.85rem; }
+    .msg.ok { background: rgba(63,185,80,0.15); border: 1px solid var(--green); color: var(--green); }
+    .msg.err { background: rgba(248,81,73,0.15); border: 1px solid var(--red); color: var(--red); }
+    .msg.info { background: rgba(88,166,255,0.1); border: 1px solid var(--accent); color: var(--accent); }
+    .list { list-style: none; }
+    .list li {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    .list li:hover { background: var(--bg-hover); }
+    .list .hash { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim); word-break: break-all; }
+    .list .meta { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; color: var(--text-dim); font-size: 0.8rem; }
+    .list .actions-inline { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .snippet-detail { padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); margin-bottom: 1rem; }
+    .snippet-detail .id-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .filter-bar { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .filter-bar select { width: auto; margin-bottom: 0; }
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; font-size: 0.85rem; }
+    .config-item { padding: 0.5rem; background: var(--bg); border-radius: 4px; }
+    .config-item .k { color: var(--text-dim); }
+    .config-item .v { font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
