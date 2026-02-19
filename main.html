@@ -430,3 +430,51 @@
           document.getElementById('stat-withdrawable').textContent = tipBal.toString();
           document.getElementById('tip-balance').textContent = tipBal.toString();
           document.getElementById('stat-reputation').textContent = rep.toString();
+          const badgeBits = await contract.getBadgeBits(addr);
+          const badgeEl = document.getElementById('stat-badges');
+          badgeEl.innerHTML = '';
+          for (let i = 0; i < 16; i++) {
+            if ((Number(badgeBits) & (1 << i)) !== 0) {
+              const dot = document.createElement('span');
+              dot.className = 'badge-dot';
+              dot.title = 'Badge ' + i;
+              badgeEl.appendChild(dot);
+            }
+          }
+          if (badgeEl.children.length === 0) badgeEl.textContent = '0';
+
+          const langFilter = document.getElementById('filter-lang').value;
+          const recent = await contract.getRecentSnippetIds();
+          const ul = document.getElementById('snippet-list');
+          ul.innerHTML = '';
+          if (recent.length === 0) { ul.innerHTML = '<li class="text-dim">No snippets yet.</li>'; return; }
+          const take = Math.min(25, recent.length);
+          let shown = 0;
+          for (let i = recent.length - 1; i >= 0 && shown < take; i--) {
+            const id = recent[i];
+            const s = await contract.getSnippet(id);
+            const [author, contentHash, langId, createdAt, updatedAt, tipBal, repScore, deleted] = s;
+            if (deleted) continue;
+            const langStr = langId === ethers.keccak256(ethers.toUtf8Bytes('solidity')) ? 'solidity' : langId === ethers.keccak256(ethers.toUtf8Bytes('javascript')) ? 'javascript' : langId === ethers.keccak256(ethers.toUtf8Bytes('python')) ? 'python' : langId === ethers.keccak256(ethers.toUtf8Bytes('rust')) ? 'rust' : '?';
+            if (langFilter && langFilter !== langStr) continue;
+            shown++;
+            const li = document.createElement('li');
+            li.innerHTML = '<div class="hash">' + contentHash.slice(0, 24) + '…</div>' +
+              '<div class="meta">ID ' + id + ' · ' + shortAddr(author) + ' · ' + langStr + ' · rep ' + repScore + ' · tips ' + tipBal + ' · ' + formatTs(createdAt) + '</div>' +
+              '<div class="actions-inline">' +
+              '<button type="button" class="btn small" data-upvote="' + id + '">↑</button>' +
+              '<button type="button" class="btn small" data-downvote="' + id + '">↓</button>' +
+              '<button type="button" class="btn small" data-tip="' + id + '">Tip</button>' +
+              '<button type="button" class="btn small" data-lookup="' + id + '">Detail</button>' +
+              '</div>';
+            ul.appendChild(li);
+          }
+          if (ul.children.length === 0) ul.innerHTML = '<li class="text-dim">No snippets for this filter.</li>';
+          ul.querySelectorAll('[data-upvote]').forEach(b => b.addEventListener('click', () => upvote(Number(b.dataset.upvote))));
+          ul.querySelectorAll('[data-downvote]').forEach(b => b.addEventListener('click', () => downvote(Number(b.dataset.downvote))));
+          ul.querySelectorAll('[data-tip]').forEach(b => { document.getElementById('tip-snippet-id').value = b.dataset.tip; document.querySelector('[data-tab="tips"]').click(); });
+          ul.querySelectorAll('[data-lookup]').forEach(b => { document.getElementById('lookup-id').value = b.dataset.lookup; loadLookup(Number(b.dataset.lookup)); document.querySelector('[data-tab="lookup"]').click(); });
+
+          await refreshMySnippets();
+          await refreshTop();
+          await refreshMyHints();
