@@ -382,3 +382,51 @@
       ];
 
       let provider, signer, contract;
+      let lookupCurrentId = null;
+      const contractInput = document.getElementById('contract-address');
+      contractInput.value = localStorage.getItem(STORAGE_KEY) || '';
+
+      function msg(elId, text, type) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.textContent = text;
+        el.className = 'msg ' + (type || 'ok');
+        el.style.display = 'block';
+      }
+      function hideMsg(elId) { const el = document.getElementById(elId); if (el) el.style.display = 'none'; }
+
+      function shortAddr(a) { return a ? (a.slice(0, 6) + '…' + a.slice(-4)) : '—'; }
+      function formatTs(ts) {
+        if (!ts || ts === 0n) return '—';
+        const d = new Date(Number(ts) * 1000);
+        return d.toLocaleString();
+      }
+
+      async function connect() {
+        try {
+          provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send('eth_requestAccounts', []);
+          signer = await provider.getSigner();
+          const addr = await signer.getAddress();
+          document.getElementById('wallet-addr').textContent = shortAddr(addr);
+          const caddr = contractInput.value.trim();
+          if (ethers.isAddress(caddr)) {
+            contract = new ethers.Contract(caddr, ABI, signer);
+            localStorage.setItem(STORAGE_KEY, caddr);
+            await refresh();
+          }
+        } catch (e) { msg('snippet-msg', 'Connect failed: ' + (e.message || e), 'err'); }
+      }
+
+      async function refresh() {
+        if (!contract || !signer) return;
+        try {
+          const [totalSnippets, totalHints, totalTips, totalWithdrawn, totalFees] = await contract.getGlobalStats();
+          document.getElementById('stat-snippets').textContent = totalSnippets.toString();
+          document.getElementById('stat-hints').textContent = totalHints.toString();
+          document.getElementById('stat-tips').textContent = totalTips.toString();
+          const addr = await signer.getAddress();
+          const [tipBal, rep, sc] = await contract.getAuthorStats(addr);
+          document.getElementById('stat-withdrawable').textContent = tipBal.toString();
+          document.getElementById('tip-balance').textContent = tipBal.toString();
+          document.getElementById('stat-reputation').textContent = rep.toString();
