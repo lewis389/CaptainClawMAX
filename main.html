@@ -334,3 +334,51 @@
           <div class="config-item"><span class="k">Paused</span><div class="v" id="cfg-paused">—</div></div>
           <div class="config-item"><span class="k">Version</span><div class="v" id="cfg-version">—</div></div>
           <div class="config-item"><span class="k">Curator</span><div class="v" id="cfg-curator">—</div></div>
+          <div class="config-item"><span class="k">Treasury</span><div class="v" id="cfg-treasury">—</div></div>
+          <div class="config-item"><span class="k">Fulfiller</span><div class="v" id="cfg-fulfiller">—</div></div>
+          <div class="config-item"><span class="k">Min tip (wei)</span><div class="v" id="cfg-mintip">—</div></div>
+          <div class="config-item"><span class="k">Max snippets/author</span><div class="v" id="cfg-maxsnip">—</div></div>
+          <div class="config-item"><span class="k">Treasury fee (bps)</span><div class="v" id="cfg-fee">—</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function() {
+      const STORAGE_KEY = 'captainclawmax_contract';
+      const ABI = [
+        'function submitSnippet(bytes32 contentHash, bytes32 languageId, bytes calldata title) returns (uint256)',
+        'function updateSnippet(uint256 snippetId, bytes32 newContentHash)',
+        'function deleteSnippet(uint256 snippetId)',
+        'function addTagToSnippet(uint256 snippetId, bytes32 tagId)',
+        'function tipSnippet(uint256 snippetId) payable',
+        'function withdrawTips()',
+        'function upvoteSnippet(uint256 snippetId)',
+        'function downvoteSnippet(uint256 snippetId)',
+        'function requestHint(bytes32 topicHash, uint256 snippetId) returns (uint256)',
+        'function batchSubmitSnippets(bytes32[] calldata contentHashes, bytes32[] calldata languageIds, bytes[] calldata titles) returns (uint256[])',
+        'function getSnippet(uint256) view returns (address,bytes32,bytes32,uint256,uint256,uint256,uint256,bool)',
+        'function getRecentSnippetIds() view returns (uint256[])',
+        'function getGlobalStats() view returns (uint256,uint256,uint256,uint256,uint256)',
+        'function getAuthorStats(address) view returns (uint256,uint256,uint256)',
+        'function getAccountSummary(address) view returns (uint256,uint256,uint256,uint256,uint256)',
+        'function getSnippetIdsByAuthor(address) view returns (uint256[])',
+        'function getHintRequestIdsByUser(address) view returns (uint256[])',
+        'function getHintRequest(uint256) view returns (address,bytes32,uint256,uint256,uint256,address,bool)',
+        'function getTopSnippetsByReputation(uint256) view returns (uint256[],uint256[])',
+        'function getTagsForSnippet(uint256) view returns (bytes32[])',
+        'function getBadgeBits(address) view returns (uint256)',
+        'function hasBadge(address,uint256) view returns (bool)',
+        'function computeContentHash(bytes calldata) view returns (bytes32)',
+        'function computeLanguageId(string calldata) view returns (bytes32)',
+        'function computeTopicHash(string calldata) view returns (bytes32)',
+        'function ccmPaused() view returns (bool)',
+        'function getVersion() view returns (uint256)',
+        'function getMinTipWei() view returns (uint256)',
+        'function getMaxSnippetsPerAuthor() view returns (uint256)',
+        'function getTreasuryFeeBps() view returns (uint256)',
+        'function getRoleAddresses() view returns (address,address,address)'
+      ];
+
+      let provider, signer, contract;
