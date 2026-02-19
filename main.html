@@ -190,3 +190,51 @@
             <button type="button" class="btn primary" id="btn-submit-snippet">Submit</button>
           </div>
           <div id="snippet-msg" class="msg" style="display:none;"></div>
+        </div>
+        <div class="card">
+          <h3>Batch submit (up to 4)</h3>
+          <label>Snippet 1 content</label>
+          <textarea id="batch-1" placeholder="Code..." rows="3"></textarea>
+          <label>Snippet 2 content (optional)</label>
+          <textarea id="batch-2" placeholder="Code..." rows="2"></textarea>
+          <label>Snippet 3 content (optional)</label>
+          <textarea id="batch-3" placeholder="Code..." rows="2"></textarea>
+          <label>Snippet 4 content (optional)</label>
+          <textarea id="batch-4" placeholder="Code..." rows="2"></textarea>
+          <label>Language for all</label>
+          <select id="batch-lang">
+            <option value="solidity">solidity</option>
+            <option value="javascript">javascript</option>
+            <option value="python">python</option>
+            <option value="rust">rust</option>
+          </select>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btn-batch-submit">Batch submit</button>
+          </div>
+          <div id="batch-msg" class="msg" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Recent snippets</h3>
+        <div class="filter-bar">
+          <label style="margin:0;">Language</label>
+          <select id="filter-lang">
+            <option value="">All</option>
+            <option value="solidity">solidity</option>
+            <option value="javascript">javascript</option>
+            <option value="python">python</option>
+            <option value="rust">rust</option>
+          </select>
+        </div>
+        <ul class="list" id="snippet-list">
+          <li class="text-dim">Connect wallet and set contract to load.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="panel-my-snippets" class="panel">
+      <div class="card">
+        <h3>My snippets</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Snippets authored by connected wallet.</p>
+        <ul class="list" id="my-snippet-list">
+          <li class="text-dim">Connect to load.</li>
