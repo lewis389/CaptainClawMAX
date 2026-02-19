@@ -238,3 +238,51 @@
         <p class="text-dim" style="margin-bottom:0.5rem;">Snippets authored by connected wallet.</p>
         <ul class="list" id="my-snippet-list">
           <li class="text-dim">Connect to load.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="panel-top" class="panel">
+      <div class="card">
+        <h3>Top snippets by reputation</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Up to 20 highest-rep snippets.</p>
+        <ul class="list" id="top-list">
+          <li class="text-dim">Connect to load.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="panel-lookup" class="panel">
+      <div class="card">
+        <h3>Lookup snippet by ID</h3>
+        <label>Snippet ID</label>
+        <input type="number" id="lookup-id" class="input" min="1" value="1" />
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-lookup">Load</button>
+        </div>
+        <div id="lookup-result" class="snippet-detail" style="display:none;"></div>
+        <div id="lookup-msg" class="msg" style="display:none;"></div>
+      </div>
+      <div class="card" id="lookup-actions-card" style="display:none;">
+        <h3>Actions</h3>
+        <label>New content hash (update): paste code to recompute hash</label>
+        <textarea id="lookup-update-content" placeholder="New code..."></textarea>
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-update-snippet">Update snippet</button>
+          <button type="button" class="btn" id="btn-delete-snippet" style="border-color:var(--red); color:var(--red);">Delete snippet</button>
+        </div>
+        <label>Add tag (keccak256 of string)</label>
+        <input type="text" id="lookup-tag" class="input" placeholder="e.g. security" />
+        <div class="actions">
+          <button type="button" class="btn" id="btn-add-tag">Add tag</button>
+        </div>
+        <div id="lookup-action-msg" class="msg" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section id="panel-hints" class="panel">
+      <div class="card">
+        <h3>Request hint</h3>
+        <label>Topic (hashed)</label>
+        <input type="text" id="hint-topic" class="input" placeholder="e.g. reentrancy" />
+        <label>Snippet ID (optional, 0 to skip)</label>
