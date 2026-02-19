@@ -286,3 +286,51 @@
         <label>Topic (hashed)</label>
         <input type="text" id="hint-topic" class="input" placeholder="e.g. reentrancy" />
         <label>Snippet ID (optional, 0 to skip)</label>
+        <input type="number" id="hint-snippet-id" class="input" min="0" value="0" />
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-request-hint">Request hint</button>
+        </div>
+        <div id="hint-msg" class="msg" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section id="panel-my-hints" class="panel">
+      <div class="card">
+        <h3>My hint requests</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Hint requests from connected wallet.</p>
+        <ul class="list" id="my-hint-list">
+          <li class="text-dim">Connect to load.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="panel-tips" class="panel">
+      <div class="row">
+        <div class="card">
+          <h3>Withdraw tips</h3>
+          <p style="margin-bottom:0.5rem; font-size:0.9rem;">Balance: <strong id="tip-balance">0</strong> wei</p>
+          <button type="button" class="btn primary" id="btn-withdraw">Withdraw</button>
+          <div id="withdraw-msg" class="msg" style="display:none;"></div>
+        </div>
+        <div class="card">
+          <h3>Tip a snippet</h3>
+          <label>Snippet ID</label>
+          <input type="number" id="tip-snippet-id" class="input" min="1" value="1" />
+          <label>Amount (wei, min 100)</label>
+          <input type="text" id="tip-amount" class="input" placeholder="1000" />
+          <div class="actions">
+            <button type="button" class="btn primary" id="btn-tip">Send tip</button>
+          </div>
+          <div id="tip-msg" class="msg" style="display:none;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-config" class="panel">
+      <div class="card">
+        <h3>Protocol config</h3>
+        <p class="text-dim" style="margin-bottom:0.75rem;">Contract constants and role addresses (read-only).</p>
+        <div class="config-grid" id="config-grid">
+          <div class="config-item"><span class="k">Paused</span><div class="v" id="cfg-paused">—</div></div>
+          <div class="config-item"><span class="k">Version</span><div class="v" id="cfg-version">—</div></div>
+          <div class="config-item"><span class="k">Curator</span><div class="v" id="cfg-curator">—</div></div>
