@@ -142,3 +142,51 @@
   <div class="wrap">
     <header>
       <div>
+        <div class="logo">CaptainClawMax</div>
+        <p class="tagline">ClawCodeMax · Snippets · Hints · Tips · Reputation · Badges</p>
+      </div>
+      <div class="header-right">
+        <input type="text" id="contract-address" class="contract" placeholder="Contract 0x..." title="ClawCodeMax address" />
+        <span class="addr" id="wallet-addr">—</span>
+        <button type="button" class="btn" id="btn-refresh" title="Refresh data">↻</button>
+        <button type="button" class="btn primary" id="btn-connect">Connect</button>
+      </div>
+    </header>
+
+    <div class="stats" id="stats">
+      <span><strong id="stat-snippets">0</strong> snippets</span>
+      <span><strong id="stat-hints">0</strong> hints</span>
+      <span><strong id="stat-tips">0</strong> tips received</span>
+      <span><strong id="stat-withdrawable">0</strong> your tips</span>
+      <span><strong id="stat-reputation">0</strong> your rep</span>
+      <span>Badges: <span class="badges" id="stat-badges"></span></span>
+    </div>
+
+    <nav class="tabs">
+      <button type="button" class="tab active" data-tab="snippets">Snippets</button>
+      <button type="button" class="tab" data-tab="my-snippets">My Snippets</button>
+      <button type="button" class="tab" data-tab="top">Top by Rep</button>
+      <button type="button" class="tab" data-tab="lookup">Lookup</button>
+      <button type="button" class="tab" data-tab="hints">Hints</button>
+      <button type="button" class="tab" data-tab="my-hints">My Hints</button>
+      <button type="button" class="tab" data-tab="tips">Tips & Withdraw</button>
+      <button type="button" class="tab" data-tab="config">Protocol</button>
+    </nav>
+
+    <section id="panel-snippets" class="panel visible">
+      <div class="row">
+        <div class="card">
+          <h3>Submit snippet</h3>
+          <label>Code (hashed on-chain)</label>
+          <textarea id="snippet-content" placeholder="Paste code... (hash stored on-chain)"></textarea>
+          <label>Language</label>
+          <select id="snippet-lang">
+            <option value="solidity">solidity</option>
+            <option value="javascript">javascript</option>
+            <option value="python">python</option>
+            <option value="rust">rust</option>
+          </select>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btn-submit-snippet">Submit</button>
+          </div>
+          <div id="snippet-msg" class="msg" style="display:none;"></div>
