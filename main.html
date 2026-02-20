@@ -526,3 +526,51 @@
               '<div class="actions-inline"><button type="button" class="btn small" data-tip="' + id + '">Tip</button><button type="button" class="btn small" data-lookup="' + id + '">Detail</button></div>';
             ul.appendChild(li);
           }
+          ul.querySelectorAll('[data-tip]').forEach(b => { document.getElementById('tip-snippet-id').value = b.dataset.tip; });
+          ul.querySelectorAll('[data-lookup]').forEach(b => { document.getElementById('lookup-id').value = b.dataset.lookup; loadLookup(Number(b.dataset.lookup)); document.querySelector('[data-tab="lookup"]').click(); });
+        } catch (_) { ul.innerHTML = '<li class="text-dim">Error loading.</li>'; }
+      }
+
+      async function refreshMyHints() {
+        const ul = document.getElementById('my-hint-list');
+        if (!contract || !signer) { ul.innerHTML = '<li class="text-dim">Connect to load.</li>'; return; }
+        try {
+          const addr = await signer.getAddress();
+          const ids = await contract.getHintRequestIdsByUser(addr);
+          ul.innerHTML = '';
+          if (ids.length === 0) { ul.innerHTML = '<li class="text-dim">No hint requests yet.</li>'; return; }
+          for (let i = ids.length - 1; i >= 0; i--) {
+            const hid = ids[i];
+            const h = await contract.getHintRequest(hid);
+            const [requester, topicHash, snippetId, createdAt, fulfilledAt, fulfiller, fulfilled] = h;
+            const li = document.createElement('li');
+            li.innerHTML = '<div class="hash">Hint #' + hid + ' · topic ' + topicHash.slice(0, 16) + '…</div>' +
+              '<div class="meta">Snippet ' + snippetId + ' · ' + formatTs(createdAt) + (fulfilled ? ' · fulfilled ' + formatTs(fulfilledAt) : ' · pending') + '</div>';
+            ul.appendChild(li);
+          }
+        } catch (_) { ul.innerHTML = '<li class="text-dim">Error loading.</li>'; }
+      }
+
+      async function refreshConfig() {
+        if (!contract) return;
+        try {
+          const paused = await contract.ccmPaused();
+          document.getElementById('cfg-paused').textContent = paused ? 'Yes' : 'No';
+          const version = await contract.getVersion();
+          document.getElementById('cfg-version').textContent = version.toString();
+          const [curator, treasury, fulfiller] = await contract.getRoleAddresses();
+          document.getElementById('cfg-curator').textContent = shortAddr(curator);
+          document.getElementById('cfg-treasury').textContent = shortAddr(treasury);
+          document.getElementById('cfg-fulfiller').textContent = shortAddr(fulfiller);
+          document.getElementById('cfg-mintip').textContent = (await contract.getMinTipWei()).toString();
+          document.getElementById('cfg-maxsnip').textContent = (await contract.getMaxSnippetsPerAuthor()).toString();
+          document.getElementById('cfg-fee').textContent = (await contract.getTreasuryFeeBps()).toString();
+        } catch (_) {}
+      }
+
+      async function loadLookup(id) {
+        lookupCurrentId = id;
+        const resultEl = document.getElementById('lookup-result');
+        const actionsCard = document.getElementById('lookup-actions-card');
+        const actionMsg = document.getElementById('lookup-action-msg');
+        hideMsg('lookup-msg');
