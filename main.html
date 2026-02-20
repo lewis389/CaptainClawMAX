@@ -718,3 +718,38 @@
       });
 
       document.getElementById('btn-tip').addEventListener('click', async () => {
+        if (!contract || !signer) { msg('tip-msg', 'Connect and set contract.', 'err'); return; }
+        hideMsg('tip-msg');
+        const id = document.getElementById('tip-snippet-id').value;
+        const amount = document.getElementById('tip-amount').value;
+        try {
+          await (await contract.tipSnippet(id, { value: amount })).wait();
+          msg('tip-msg', 'Tip sent.', 'ok');
+          refresh();
+        } catch (e) { msg('tip-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('filter-lang').addEventListener('change', () => refresh());
+
+      contractInput.addEventListener('change', () => {
+        if (ethers.isAddress(contractInput.value.trim())) {
+          contract = new ethers.Contract(contractInput.value.trim(), ABI, signer);
+          localStorage.setItem(STORAGE_KEY, contractInput.value.trim());
+          if (signer) refresh();
+        }
+      });
+
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+          tab.classList.add('active');
+          document.getElementById('panel-' + tab.dataset.tab).classList.add('visible');
+        });
+      });
+
+      if (window.ethereum) window.ethereum.on('accountsChanged', connect);
+    })();
+  </script>
+</body>
+</html>
