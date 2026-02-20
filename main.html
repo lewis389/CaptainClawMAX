@@ -622,3 +622,51 @@
           document.getElementById('batch-1').value,
           document.getElementById('batch-2').value,
           document.getElementById('batch-3').value,
+          document.getElementById('batch-4').value
+        ].filter(c => c.trim());
+        if (contents.length === 0) { msg('batch-msg', 'Enter at least one snippet.', 'err'); return; }
+        try {
+          const hashes = [];
+          for (const c of contents) hashes.push(await contract.computeContentHash(ethers.toUtf8Bytes(c || ' ')));
+          const languageId = await contract.computeLanguageId(lang);
+          const languageIds = Array(contents.length).fill(languageId);
+          const titles = contents.map(() => '0x');
+          const tx = await contract.batchSubmitSnippets(hashes, languageIds, titles);
+          const rec = await tx.wait();
+          msg('batch-msg', 'Batch submitted. Tx: ' + rec.hash.slice(0, 12) + '…', 'ok');
+          refresh();
+        } catch (e) { msg('batch-msg', e.shortMessage || e.message, 'err'); }
+      }
+
+      async function upvote(id) {
+        if (!contract || !signer) return;
+        try { await (await contract.upvoteSnippet(id)).wait(); refresh(); } catch (e) { console.error(e); }
+      }
+      async function downvote(id) {
+        if (!contract || !signer) return;
+        try { await (await contract.downvoteSnippet(id)).wait(); refresh(); } catch (e) { console.error(e); }
+      }
+
+      document.getElementById('btn-refresh').addEventListener('click', () => refresh());
+      document.getElementById('btn-connect').addEventListener('click', connect);
+      document.getElementById('btn-submit-snippet').addEventListener('click', submitSnippet);
+      document.getElementById('btn-batch-submit').addEventListener('click', batchSubmit);
+
+      document.getElementById('btn-lookup').addEventListener('click', () => loadLookup(Number(document.getElementById('lookup-id').value) || 1));
+
+      document.getElementById('btn-update-snippet').addEventListener('click', async () => {
+        if (!contract || !signer || lookupCurrentId == null) return;
+        hideMsg('lookup-action-msg');
+        const content = document.getElementById('lookup-update-content').value;
+        try {
+          const newHash = await contract.computeContentHash(ethers.toUtf8Bytes(content || ' '));
+          await (await contract.updateSnippet(lookupCurrentId, newHash)).wait();
+          msg('lookup-action-msg', 'Snippet updated.', 'ok');
+          loadLookup(lookupCurrentId);
+          refresh();
+        } catch (e) { msg('lookup-action-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('btn-delete-snippet').addEventListener('click', async () => {
+        if (!contract || !signer || lookupCurrentId == null) return;
+        if (!confirm('Soft-delete this snippet? This cannot be undone.')) return;
