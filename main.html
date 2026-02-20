@@ -478,3 +478,51 @@
           await refreshMySnippets();
           await refreshTop();
           await refreshMyHints();
+          await refreshConfig();
+        } catch (err) { console.error(err); }
+      }
+
+      async function refreshMySnippets() {
+        const ul = document.getElementById('my-snippet-list');
+        if (!contract || !signer) { ul.innerHTML = '<li class="text-dim">Connect to load.</li>'; return; }
+        try {
+          const addr = await signer.getAddress();
+          const ids = await contract.getSnippetIdsByAuthor(addr);
+          ul.innerHTML = '';
+          if (ids.length === 0) { ul.innerHTML = '<li class="text-dim">No snippets yet.</li>'; return; }
+          for (let i = ids.length - 1; i >= 0; i--) {
+            const id = ids[i];
+            const s = await contract.getSnippet(id);
+            const [author, contentHash, langId, createdAt, updatedAt, tipBal, repScore, deleted] = s;
+            const li = document.createElement('li');
+            li.innerHTML = '<div class="hash">' + contentHash.slice(0, 24) + '…</div>' +
+              '<div class="meta">ID ' + id + (deleted ? ' · <span style="color:var(--red)">deleted</span>' : '') + ' · rep ' + repScore + ' · tips ' + tipBal + '</div>' +
+              '<div class="actions-inline">' +
+              (deleted ? '' : '<button type="button" class="btn small" data-lookup="' + id + '">Detail</button>') +
+              '</div>';
+            ul.appendChild(li);
+          }
+          ul.querySelectorAll('[data-lookup]').forEach(b => { document.getElementById('lookup-id').value = b.dataset.lookup; loadLookup(Number(b.dataset.lookup)); document.querySelector('[data-tab="lookup"]').click(); });
+        } catch (_) { ul.innerHTML = '<li class="text-dim">Error loading.</li>'; }
+      }
+
+      async function refreshTop() {
+        const ul = document.getElementById('top-list');
+        if (!contract || !signer) { ul.innerHTML = '<li class="text-dim">Connect to load.</li>'; return; }
+        try {
+          const [ids, scores] = await contract.getTopSnippetsByReputation(20);
+          ul.innerHTML = '';
+          if (!ids || ids.length === 0) { ul.innerHTML = '<li class="text-dim">No snippets yet.</li>'; return; }
+          for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+            const sc = scores[i];
+            if (id === 0n) continue;
+            const s = await contract.getSnippet(id);
+            const [author, contentHash, , , , tipBal, , deleted] = s;
+            if (deleted) continue;
+            const li = document.createElement('li');
+            li.innerHTML = '<div class="hash">#' + id + ' ' + contentHash.slice(0, 20) + '…</div>' +
+              '<div class="meta">' + shortAddr(author) + ' · rep ' + sc + ' · tips ' + tipBal + '</div>' +
+              '<div class="actions-inline"><button type="button" class="btn small" data-tip="' + id + '">Tip</button><button type="button" class="btn small" data-lookup="' + id + '">Detail</button></div>';
+            ul.appendChild(li);
+          }
