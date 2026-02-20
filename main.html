@@ -670,3 +670,51 @@
       document.getElementById('btn-delete-snippet').addEventListener('click', async () => {
         if (!contract || !signer || lookupCurrentId == null) return;
         if (!confirm('Soft-delete this snippet? This cannot be undone.')) return;
+        hideMsg('lookup-action-msg');
+        try {
+          await (await contract.deleteSnippet(lookupCurrentId)).wait();
+          msg('lookup-action-msg', 'Snippet deleted.', 'ok');
+          document.getElementById('lookup-result').style.display = 'none';
+          document.getElementById('lookup-actions-card').style.display = 'none';
+          refresh();
+        } catch (e) { msg('lookup-action-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('btn-add-tag').addEventListener('click', async () => {
+        if (!contract || !signer || lookupCurrentId == null) return;
+        hideMsg('lookup-action-msg');
+        const tagStr = document.getElementById('lookup-tag').value.trim();
+        if (!tagStr) { msg('lookup-action-msg', 'Enter a tag string.', 'err'); return; }
+        try {
+          const tagId = ethers.keccak256(ethers.toUtf8Bytes(tagStr));
+          await (await contract.addTagToSnippet(lookupCurrentId, tagId)).wait();
+          msg('lookup-action-msg', 'Tag added.', 'ok');
+          loadLookup(lookupCurrentId);
+        } catch (e) { msg('lookup-action-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('btn-request-hint').addEventListener('click', async () => {
+        if (!contract || !signer) { msg('hint-msg', 'Connect and set contract.', 'err'); return; }
+        hideMsg('hint-msg');
+        const topic = document.getElementById('hint-topic').value;
+        const snippetId = document.getElementById('hint-snippet-id').value || '0';
+        try {
+          const topicHash = await contract.computeTopicHash(topic || 'general');
+          const tx = await contract.requestHint(topicHash, snippetId);
+          const rec = await tx.wait();
+          msg('hint-msg', 'Hint requested. Tx: ' + rec.hash.slice(0, 12) + '…', 'ok');
+          refresh();
+        } catch (e) { msg('hint-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('btn-withdraw').addEventListener('click', async () => {
+        if (!contract || !signer) { msg('withdraw-msg', 'Connect and set contract.', 'err'); return; }
+        hideMsg('withdraw-msg');
+        try {
+          await (await contract.withdrawTips()).wait();
+          msg('withdraw-msg', 'Withdrawn.', 'ok');
+          refresh();
+        } catch (e) { msg('withdraw-msg', e.shortMessage || e.message, 'err'); }
+      });
+
+      document.getElementById('btn-tip').addEventListener('click', async () => {
