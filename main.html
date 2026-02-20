@@ -574,3 +574,51 @@
         const actionsCard = document.getElementById('lookup-actions-card');
         const actionMsg = document.getElementById('lookup-action-msg');
         hideMsg('lookup-msg');
+        if (!contract) { msg('lookup-msg', 'Set contract and connect.', 'err'); return; }
+        try {
+          const s = await contract.getSnippet(id);
+          const [author, contentHash, langId, createdAt, updatedAt, tipBal, repScore, deleted] = s;
+          const tags = await contract.getTagsForSnippet(id);
+          const addr = await signer?.getAddress();
+          const isOwner = addr && author && addr.toLowerCase() === author.toLowerCase();
+          resultEl.style.display = 'block';
+          resultEl.innerHTML = '<div class="id-row"><strong>Snippet #' + id + '</strong>' + (deleted ? ' <span style="color:var(--red)">deleted</span>' : '') + '</div>' +
+            '<div class="meta">Author: ' + shortAddr(author) + '</div>' +
+            '<div class="meta">Content hash: ' + contentHash + '</div>' +
+            '<div class="meta">Created: ' + formatTs(createdAt) + ' · Updated: ' + formatTs(updatedAt) + '</div>' +
+            '<div class="meta">Tip balance: ' + tipBal + ' wei · Reputation: ' + repScore + '</div>' +
+            (tags.length > 0 ? '<div class="meta">Tags: ' + tags.map(t => t.slice(0, 18) + '…').join(', ') + '</div>' : '');
+          actionsCard.style.display = isOwner && !deleted ? 'block' : 'none';
+          document.getElementById('lookup-update-content').value = '';
+          document.getElementById('lookup-tag').value = '';
+          hideMsg('lookup-action-msg');
+        } catch (e) {
+          resultEl.style.display = 'none';
+          actionsCard.style.display = 'none';
+          msg('lookup-msg', e.shortMessage || e.message, 'err');
+        }
+      }
+
+      async function submitSnippet() {
+        if (!contract || !signer) { msg('snippet-msg', 'Connect and set contract.', 'err'); return; }
+        hideMsg('snippet-msg');
+        const content = document.getElementById('snippet-content').value;
+        const lang = document.getElementById('snippet-lang').value;
+        try {
+          const contentHash = await contract.computeContentHash(ethers.toUtf8Bytes(content || ' '));
+          const languageId = await contract.computeLanguageId(lang);
+          const tx = await contract.submitSnippet(contentHash, languageId, ethers.toUtf8Bytes(''));
+          const rec = await tx.wait();
+          msg('snippet-msg', 'Snippet submitted. Tx: ' + rec.hash.slice(0, 12) + '…', 'ok');
+          refresh();
+        } catch (e) { msg('snippet-msg', e.shortMessage || e.message, 'err'); }
+      }
+
+      async function batchSubmit() {
+        if (!contract || !signer) { msg('batch-msg', 'Connect and set contract.', 'err'); return; }
+        hideMsg('batch-msg');
+        const lang = document.getElementById('batch-lang').value;
+        const contents = [
+          document.getElementById('batch-1').value,
+          document.getElementById('batch-2').value,
+          document.getElementById('batch-3').value,
